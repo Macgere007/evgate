@@ -1,0 +1,6 @@
+<div class="w-full grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-0 sm:p-5">
+  <app-card [title]="'EVgate'" [value]="statusCard?.EV_count" [icon]="'ev_station'" [icon_color]="'text-blue-500'" [style]="'hover:scale-105 transition-transform ease-in duration-100'"></app-card>
+  <app-card [title]="'Assigned'" [value]="statusCard?.assigned" [icon]="'check_circle'" [icon_color]="'text-green-500'" [style]="'hover:scale-105 transition-transform ease-in duration-100'"></app-card>
+  <app-card [title]="'Not Assigned'" [value]="statusCard?.unassigned" [icon]="'cancel'" [icon_color]="'text-red-500'" [style]="'hover:scale-105 transition-transform ease-in duration-100'"></app-card>
+  <app-card [title]="'Charging'" [value]="statusCard?.charging" [icon]="'offline_bolt'" [icon_color]="'text-yellow-500'" [style]="'hover:scale-105 transition-transform ease-in duration-100'"></app-card>
+</div>

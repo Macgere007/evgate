@@ -1,0 +1,14 @@
+<div class="flex flex-col flex-auto bg-card w-full shadow rounded-2xl overflow-hidden">
+  <div class="flex items-center justify-between mt-10 ml-10 mr-6 sm:mr-10">
+    <div class="mr-4 text-lg md:text-3xl font-semibold tracking-tight leading-7 mb-6">
+      {{title | transloco}}
+    </div>
+  </div>
+  <mat-progress-bar *ngIf="isloadingGraph || !data" class="m-auto" mode="indeterminate"></mat-progress-bar>
+  <div class="flex flex-col flex-auto h-100" *ngIf="!isloadingGraph && data && data.series['daily'][0].data">
+    <apx-chart class="flex-auto w-full h-full mb-6" [chart]="data.chart" [colors]="data.colors"
+      [dataLabels]="data.dataLabels" [fill]="data.fill" [grid]="data.grid"
+      [series]="data.series['daily']" [legend]="data.legend" [stroke]="data.stroke"
+      [tooltip]="data.tooltip" [xaxis]="data.xaxis" [yaxis]="data.yaxis"></apx-chart>
+  </div>
+</div>

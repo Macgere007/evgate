@@ -1,0 +1,97 @@
+<!-- <div *ngIf="!isloadingdash"></div> -->
+<div class="flex flex-col flex-auto min-w-0 mx-auto max-w-[1200px]">
+  <div class="w-full p-4">
+    <div class="flex flex-col dark bg-card w-full h-full shadow rounded-2xl overflow-hidden">
+      <div class="flex items-center justify-between p-4 text-white">
+        <div class="flex flex-col">
+          <div class="flex flex-row">
+            <div class="text-3xl sm:text-4xl font-medium tracking-tight">
+              {{'Energy' |transloco}}
+            </div>
+            <mat-form-field appearance="fill" class="mt-3" style="width:1px;visibility:hidden;">
+              <input class="text-sm" matInput [matDatepicker]="start" (click)="start.open()"
+                (dateInput)="changeDateActive($event.value)" [(ngModel)]="activeDate"
+                [ngModelOptions]="{standalone: true}" placeholder="MM/DD/YY" />
+            </mat-form-field>
+            <mat-datepicker-toggle class="mt-0 sm:mt-2" matIconSuffix [for]="start"></mat-datepicker-toggle>
+            <mat-datepicker #start></mat-datepicker>
+          </div>
+          <div class="-mt-12 mb-3 sm:mb-0 sm:-mt-8">
+            <div class="text-md mt-2 sm:mt-0 sm:text-lg" *ngIf="ActiveType=='daily'">{{DateActiveLabelNow}}</div>
+            <div class="text-md mt-2 sm:mt-0 sm:text-lg" *ngIf="ActiveType=='weekly'">
+              {{DateActiveWeekLabel}} - {{DateActiveLabelNow}}
+            </div>
+            <div class="text-md mt-2 sm:mt-0 sm:text-lg" *ngIf="ActiveType=='monthly'">{{DateActiveStartMonthLabel}} -
+              {{DateActiveEndMonthLabel}}
+            </div>
+          </div>
+
+        </div>
+
+        <div class="-mt-8">
+          <div class="md:hidden mb-0 md:mb-12">
+            <button mat-icon-button [matMenuTriggerFor]="activeMenu">
+              <mat-icon [svgIcon]="'heroicons_outline:dots-vertical'"></mat-icon>
+            </button>
+            <mat-menu #activeMenu="matMenu">
+              <button mat-menu-item (click)="handleChangeActiveType('daily')">
+                {{'Daily' |transloco}}
+              </button>
+              <button mat-menu-item (click)="handleChangeActiveType('weekly')">
+                {{'Weekly' |transloco}}
+              </button>
+              <!-- <button mat-menu-item (click)="handleChangeActiveType('monthly')">
+                {{'Monthly' |transloco}}
+              </button> -->
+            </mat-menu>
+          </div>
+          <div class="ml-2">
+            <mat-button-toggle-group class="hidden md:inline-flex border-none space-x-1" [value]="ActiveType">
+              <mat-button-toggle class="px-2 rounded-full overflow-hidden border-none font-medium"
+                (click)="handleChangeActiveType('daily')" value="daily">
+                {{'Daily' |transloco}}
+              </mat-button-toggle>
+              <mat-button-toggle class="px-2 rounded-full overflow-hidden border-none font-medium"
+                (click)="handleChangeActiveType('weekly')" value="weekly">
+                {{'Weekly' |transloco}}
+              </mat-button-toggle>
+              <mat-button-toggle class="px-2 rounded-full overflow-hidden border-none font-medium"
+                (click)="handleChangeActiveType('monthly')" value="monthly">
+                {{'Monthly' |transloco}}
+              </mat-button-toggle>
+            </mat-button-toggle-group>
+          </div>
+        </div>
+      </div>
+      <div class="h-90 mb-6 flex items-center">
+        <mat-progress-bar *ngIf="isloadingGraph || !activeChart" class="" mode="indeterminate"></mat-progress-bar>
+        <div *ngIf="!isloadingGraph && activeChart" class="flex flex-col flex-auto h-full">
+          <apx-chart class="flex-auto w-full h-full" [chart]="activeChart.chart" [colors]="activeChart.colors"
+            [dataLabels]="activeChart.dataLabels" [legend]="activeChart.legend" [fill]="activeChart.fill"
+            [grid]="activeChart.grid" [series]="activeChart.series" [stroke]="activeChart.stroke"
+            [tooltip]="activeChart.tooltip" [xaxis]="activeChart.xaxis" [yaxis]="activeChart.yaxis"></apx-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="w-full grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 lg:-mt-2" [class]="CountOfData > 3 ? 'mb-26' : 'mb-10'">
+    <div *ngFor="let item of dashboard; index as i"
+      class="flex flex-col flex-auto w-full h-[24rem] sm:h-[26rem] rounded-xl overflow-hidden bg-card">
+      <app-dashboard-card [car]="car" [item]="item" [auth]="authCheck" [ActiveType]="ActiveType"
+        [energy]="formatNumberWithLocale(item?.total_energy)" (updateData)="updateData(i)"
+        (updateDataEv)="updateDataEv($event)"></app-dashboard-card>
+    </div>
+  </div>
+</div>
+<!-- batas -->
+<!-- card -->
+
+<mat-paginator *ngIf="CountOfData > 3" [length]="CountOfData"
+  class="absolute -bottom-2 xs:bottom-0 xs:right-0 bg-transparent" [pageSize]="sizePage" [pageIndex]="pageIndex"
+  [pageSizeOptions]="[3, 6, 12, 24]" aria-label="Select page" (page)="onPageChange($event)">
+</mat-paginator>
+
+<div translate>
+  <lib-toastify-toast-container></lib-toastify-toast-container>
+</div>

@@ -1,0 +1,150 @@
+<fuse-card class="flex flex-col flex-auto sm:w-full group" #expandableCardRustam="fuseCard">
+  <div class="flex justify-between bg-card">
+    <div class="flex flex-row space-x-2 mt-2 ml-2" >
+      <div class="font-semibold text-xl mb-1 flex items-center mr-4" [matTooltip]="('Evgate Online' | transloco)">
+        <mat-icon class="icon-size-5 mr-1 py-1 text-green-500">check_circle</mat-icon><span class="py-1">{{
+          item["online"] }}</span>
+      </div>
+      <div class="font-semibold text-xl mb-1 flex items-center" [matTooltip]="('Evgate Offline' | transloco)">
+        <mat-icon class="icon-size-5 mr-1 py-1 text-red-500">cancel</mat-icon><span class="py-1">{{
+          item["offline"] }}</span>
+      </div>
+    </div>
+
+    <button class="text-sm mt-1 sm:mt-[0.1rem] xs:text-md text-primary ml-auto" mat-button [routerLink]="['/transaction/']" [queryParams]="{ site_id: item.id }" [disabled]="item['custom:EV_assign'].length === 0">
+        {{'Transaction EVgate' | transloco}}
+    </button>
+    <div class="flex flex-row">
+      <button mat-icon-button [matMenuTriggerFor]="siteMenu">
+        <mat-icon class="text-2xl" [svgIcon]="'heroicons_outline:dots-vertical'"></mat-icon>
+      </button>
+      <mat-menu class="flex flex-row" #siteMenu="matMenu">
+        <button  mat-menu-item (click)="updatesite()">
+          <mat-icon>edit</mat-icon>
+          {{'Update Site' | transloco}}
+        </button>
+        <button mat-menu-item (click)="deletesite()">
+          <mat-icon class="text-red-500" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+          {{'Delete Site' | transloco}}
+        </button>
+      </mat-menu>
+    </div>
+  </div>
+  <div
+    class="group-hover:opacity-100 w-full bg-black/50 transition-opacity duration-100 hidden sm:flex flex-col justify-center h-full max-h-[14rem] translate-y-11 p-4 absolute opacity-0 z-40">
+    <!-- Hidden part of the card -->
+    <hr class="border-b my-4" />
+    <div class="text-white text-md mt-1 mb-3">{{ item.address }}</div>
+    <div class="text-white flex text-md space-x-2">
+      {{'Location' | transloco}}
+      <span class="truncate">
+        : {{ item["custom:coordinates"] ? item["custom:coordinates"].join(', ') : " - " }}
+      </span>
+    </div>
+    <hr class="border-b my-4" />
+  </div>
+  <img class="object-cover group-hover:grayscale group-hover:blur-sm hidden sm:inline group-hover:bg-black/50 z-30" [src]="
+            'https://maps.googleapis.com/maps/api/staticmap?center=' +
+            item['custom:coordinates'] +
+            '&zoom=19&size=400x300&maptype=satellite&key=AIzaSyCHP9I77f_cRoxih4Ro_OvpCoJBWCZpYY8'
+        " alt="Card cover image" />
+  <div class="m-6 mb-2">
+    <div class="text-2xl font-semibold mt-1 truncate text-center sm:text-left" [matTooltip]="item.name.length > 20 ? item.name : ''">
+      {{ item.name }}
+    </div>
+    <div class="text-secondary font-semibold mt-1 truncate text-center sm:text-left" [matTooltip]="item.email.length > 20 ? item.email : ''">
+      {{ item.email }}
+    </div>
+
+    <div class="mt-1 -mx-3 flex justify-around space-x-4 sm:space-x-6">
+      <button mat-button (click)="
+                    expandableCardRustam.expanded =
+                        !expandableCardRustam.expanded
+                ">
+        <span class="text-xs sm:text-md text-primary">{{'Assign EVgate' | transloco}} ({{ item["custom:EV_assign"].length }})</span>
+        <mat-icon class="icon-size-5 transition-transform ease-in-out duration-150 rotate-0"
+          [ngClass]="{ 'rotate-180': expandableCardRustam.expanded }"
+          [svgIcon]="'heroicons_solid:chevron-down'"></mat-icon>
+      </button>
+      <a class="px-4 text-xs sm:text-md text-primary" mat-button
+        [routerLink]="['/dashboard/']" [queryParams]="{ site_id: item.id }" [disabled]="item['custom:EV_assign'].length === 0">
+        {{'Monitor EVgate' | transloco}}
+      </a>
+    </div>
+  </div>
+  <ng-container fuseCardExpansion>
+    <div class="pl-6 pr-6">
+      <div class="flex flex-col">
+        <mat-form-field class="fuse-mat-no-subscript w-full">
+          <mat-icon class="icon-size-5" [svgIcon]="'mat_outline:ev_station'" matPrefix></mat-icon>
+          <input matInput [placeholder]="('Search EVgate By ID' | transloco)" [formControl]="searchEvAssign" />
+        </mat-form-field>
+      </div>
+    </div>
+    <!-- Assign -->
+    <div class="flex flex-col divide-y xxs:pl-3 xxs:pr-3 lg:pl-6 lg:pr-6 -mt-2" *ngFor="let userassign of searchEvId">
+      <ng-container>
+        <div class="flex sm:flex-row sm:items-center py-2 cursor-default">
+          <div class="flex items-center sm:ml-3">
+            <div class="flex flex-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden">
+              <ng-container>
+                <div
+                  class="flex items-center justify-center w-full h-full rounded-full text-lg uppercase bg-blue-200 text-black-600 dark:bg-gray-700 dark:text-gray-200">
+                  {{ userassign.id[0] }}
+                </div>
+              </ng-container>
+            </div>
+            <div class="ml-4">
+              <div class="font-medium sm:text-md xxs:text-sm truncate" [matTooltip]="userassign.id.length > 15 ? userassign.id : ''">
+                {{ userassign.id }}
+              </div>
+            </div>
+          </div>
+          <div class="font-medium sm:text-md xxs:text-sm">
+            {{ userassign.name }}
+          </div>
+          <div class="flex items-center mt-0 ml-auto">
+            <div class="order-1 sm:ml-3">
+              <button mat-icon-button [matTooltip]="('Assign EVgate' | transloco)" (click)="
+                                    selectedEVId = userassign.id; assignev()
+                                ">
+                <mat-icon class="text-green-500" [svgIcon]="'heroicons_outline:plus-circle'"></mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- Unassign -->
+    <div class="flex flex-col divide-y xxs:pl-3 xxs:pr-3 lg:pl-6 lg:pr-6 pb-2"
+      *ngFor="let userunassign of item['custom:EV_assign']; let i = index">
+      <ng-container>
+        <div class="flex sm:flex-row sm:items-center py-2 cursor-default">
+          <div class="flex items-center sm:ml-3">
+            <div class="flex flex-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden">
+              <ng-container>
+                <div
+                  class="flex items-center justify-center w-full h-full rounded-full text-lg uppercase bg-blue-200 text-black-600 dark:bg-gray-700 dark:text-gray-200">
+                  {{ userunassign[0] }}
+                </div>
+              </ng-container>
+            </div>
+            <div class="ml-4">
+              <div class="font-medium sm:text-md xxs:text-sm truncate" [matTooltip]="userunassign.length > 15 ? userunassign : ''">
+                {{ userunassign }}
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center mt-2 sm:mt-0 ml-auto">
+            <div class="order-1 sm:ml-0">
+              <button mat-icon-button [matTooltip]="('Delete' | transloco)" (click)="unassignev(i)">
+                <mat-icon class="text-red-500" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </ng-container>
+</fuse-card>

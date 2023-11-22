@@ -1,0 +1,32 @@
+/* Hide the native input arrow icon */
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    display: block;
+    filter: invert(0.5);
+  }
+  
+  /* Style the input text color and placeholder */
+  input[type="datetime-local"] {
+    color: rgb(125, 136, 148);
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    .dark input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+      filter: invert(0.6);
+    }
+  }
+  
+  input[type="datetime-local"] {
+    border: 2px solid rgb(112, 122, 134);
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+  }
+
+  /* Style the input container */
+  .relative {
+    position: relative;
+  }
+  
+  /* Style the SVG icon color */
+  svg {
+    fill: transparent;
+  }

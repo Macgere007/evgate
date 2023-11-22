@@ -1,0 +1,28 @@
+<mat-accordion class="w-full rounded-md" multi>
+    <mat-expansion-panel [expanded]="isPanelExpanded" class="bg-slate-200 dark:bg-slate-700 py-2">
+      <mat-expansion-panel-header>
+        <mat-panel-title class="font-semibold text-lg text-slate-600 dark:text-slate-200">
+            {{title}}
+        </mat-panel-title>
+        <mat-panel-description class="lg:flex mx-auto hidden opacity-30 sm:mat-line sm:block">
+          {{'Click here to minimize or expand the panel'|transloco}}
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <div *ngIf="!rawData" class="flex-auto xxs:grid-cols-1 xs:grid-cols-2 grid sm:grid-cols-4 lg:grid-cols-6 grid-flow-row gap-4 mt-6">
+        <!-- Fixed -->
+        <div *ngFor="let item of getObjectKeys()" class="flex flex-col items-center justify-center sm:py-5 py-3 px-1 rounded-2xl bg-opacity-60"
+            [class]="getColor(item, data[item])">
+            <div class="mt-1 text-sm md:text-md sm:text-lg font-medium text-center">
+                <strong class="text-md tracking-tight">
+                    {{item}}
+                </strong>
+                <br/>
+                <span class="text-xs">
+                    {{convertValue(item, data[item])}}
+                </span>
+            </div>
+        </div>
+    </div>
+    <object-show-component [data]="data" [style]="'overflow-x-scroll sm:p-5 sm:grid-cols-2 -ml-5'" *ngIf="rawData"></object-show-component>
+    </mat-expansion-panel>
+    </mat-accordion>

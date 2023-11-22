@@ -1,0 +1,142 @@
+<div class="flex flex-col flex-auto min-w-0 text-black dark:text-white">
+    <!-- Main -->
+    <div class="flex-auto xxs:m-5 md:m-10">
+
+      <div class="xxs:text-md text-lg mb-5" *ngIf="dateType=='daily'">{{DateTokenNowLabel}}</div>
+      <div class="xxs:text-md text-lg mb-5" *ngIf="dateType=='weekly'">{{DateTokenOneWeekBeforeNowLabel}} -
+        {{DateTokenNowLabel}} </div>
+      <div class="xxs:text-md text-lg mb-5" *ngIf="dateType=='monthly'">{{DateTokenMonthFrom}} -
+        {{DateTokenMonthTo}} </div>
+      <div class="xxs:text-md text-lg mb-5" *ngIf="dateType=='range'">{{DateTokenRangeFrom}} -
+        {{DateTokenRangeTo === 'Invalid date' ? 'choise date' : DateTokenRangeTo}}
+      </div>
+
+      <div class="flex items-center">
+        <div class="w-15 h-15">
+          <div *ngIf="dateType !== 'range'" class="w-15 h-15">
+            <mat-form-field appearance="fill" style="width:1px;visibility:hidden;">
+              <input class="text-sm p-0.5" matInput [matDatepicker]="tokenDate" (click)="tokenDate.open()"
+                (dateInput)="showToken($event.value)" placeholder="MM/DD/YY" />
+            </mat-form-field>
+            <mat-datepicker-toggle matIconSuffix [for]="tokenDate"></mat-datepicker-toggle>
+            <mat-datepicker #tokenDate></mat-datepicker>
+          </div>
+
+          <div *ngIf="dateType === 'range'" class="w-15 h-15 flex items-start">
+            <mat-date-range-input [formGroup]="timePicker" [rangePicker]="timePickerRange"
+              style="width:1px;visibility:hidden;">
+              <input matStartDate placeholder="Start date" formControlName="start" class="text-sm p-0.5"
+                (dateInput)="showToken($event.value)">
+              <input matEndDate placeholder="End date" formControlName="end" (dateInput)="showToken($event.value)">
+            </mat-date-range-input>
+            <mat-datepicker-toggle matIconSuffix [for]="timePickerRange"></mat-datepicker-toggle>
+            <mat-date-range-picker #timePickerRange></mat-date-range-picker>
+          </div>
+        </div>
+        <!-- search -->
+        <div class="w-full">
+          <search-component (search)="onSearch($event)" [defaultValue]="filter"
+            placeholder="Search ..."></search-component>
+        </div>
+
+      </div>
+      <div class="grid grid-cols-3 gap-2 sm:gap-5 mb-5 mt-1">
+        <app-card [title]="'Total Token'" [value]="data.total_data" [icon]="'list_alt'" [icon_bottom]="true" [loading]="isloading"></app-card>
+        <app-card [title]="'Total Sukses'" [value]="data.total_success" [icon]="'list_alt'" [icon_bottom]="true" [loading]="isloading"></app-card>
+        <app-card [title]="'Total Gagal'" [value]="data.total_error" [icon]="'list_alt'" [icon_bottom]="true" [loading]="isloading"></app-card>
+      </div>
+      <!--transactions table -->
+      <div class="grid grid-cols-1 gap-8 w-full">
+        <div class="xl:col-span-2 flex flex-col flex-auto bg-card shadow rounded-2xl overflow-hidden">
+          <div class="flex justify-end">
+            <div class="p-6">
+              <div class="ml-2">
+                <mat-button-toggle-group class="hidden sm:inline-flex mx-2 border-none space-x-1" [value]="'weekly'">
+                  <mat-button-toggle class="px-2 rounded-full  overflow-hidden border-none font-medium"
+                  (click)="dateTypeTokenTable('daily')" value="daily">{{'Daily'|transloco}}
+                </mat-button-toggle>
+                <mat-button-toggle class="px-2 rounded-full  overflow-hidden border-none font-medium"
+                  (click)="dateTypeTokenTable('weekly')" value="weekly">{{'Weekly'|transloco}}
+                </mat-button-toggle>
+                <mat-button-toggle class="px-2 rounded-full  overflow-hidden border-none font-medium"
+                  (click)="dateTypeTokenTable('monthly')" value="monthly">{{'Monthly'|transloco}}
+                </mat-button-toggle>
+                <mat-button-toggle class="px-2 rounded-full  overflow-hidden border-none font-medium"
+                  (click)="dateTypeTokenTable('range')" value="range">{{'Range'|transloco}}
+                </mat-button-toggle>
+                </mat-button-toggle-group>
+              </div>
+              <div class="sm:hidden sm:my-6">
+                <button mat-icon-button [matMenuTriggerFor]="transactionTableMenu">
+                  <mat-icon [svgIcon]="'heroicons_outline:dots-vertical'"></mat-icon>
+                </button>
+                <mat-menu #transactionTableMenu="matMenu">
+                  <button mat-menu-item (click)="dateTypeTokenTable('daily')">
+                    {{'Daily'|transloco}}
+                  </button>
+                  <button mat-menu-item (click)="dateTypeTokenTable('weekly')">
+                    {{'Weekly'|transloco}}
+                  </button>
+                  <button mat-menu-item (click)="dateTypeTokenTable('monthly')">
+                    {{'Monthly'|transloco}}
+                  </button>
+                  <button mat-menu-item (click)="dateTypeTokenTable('range')">
+                    {{'Range'|transloco}}
+                  </button>
+                </mat-menu>
+              </div>
+            </div>
+          </div>
+          <div class="overflow-x-auto mx-6 h-100 max-h-100">
+            <div class="h-full flex items-center" *ngIf="isloading">
+              <mat-progress-bar class="" mode="indeterminate"></mat-progress-bar>
+            </div>
+            <table class="w-full rounded-2xl"  *ngIf="!isloading">
+              <thead class="border-b border-gray-500 bg-white dark:bg-card dark:border-gray-50 sticky top-0 z-10">
+                <tr class="text-lg font-semibold tracking-normal text-center relative text-primary">
+                  <th class="px-4 py-3">No</th>
+                  <th class="px-4 py-3">{{'Token' | transloco}}</th>
+                  <th class="px-4 py-3">{{'EVgate ID'|transloco}}</th>
+                  <th class="px-4 py-3">{{'Status'|transloco}}</th>
+                  <th class="px-4 py-3">{{'Usage Time'|transloco}}</th>
+                </tr>
+              </thead>
+              <td colspan="10" class="text-2xl text-center p-6" *ngIf="data.total_data === 0 || isloading">No records
+                available.</td>
+              <tbody class="" *ngIf="!isloading">
+                <tr *ngFor="let item of data.data; index as i"
+                  class="text-black dark:text-white text-center text-md">
+                  <td class="px-4 py-3">{{ (pageIndex * sizePage) + (i+1) }}</td>
+                  <td>
+                    <div class="flex items-end justify-center">
+                      <div class="px-4 py-3 max-w-40 truncate" [matTooltip]="item.token">{{ item.token }}</div>
+                      <button mat-button (click)="copyToClipboard(item.token)"><i class="copy-icon far fa-copy"></i></button>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3">
+                    <div class="flex items-end justify-center">
+                      <div class="px-4 py-3 max-w-40 truncate">{{ item.evgate }}</div>
+                      <button mat-button (click)="copyToClipboard(item.evgate)"><i class="copy-icon far fa-copy"></i></button>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3 capitalize" [class]="item.status === 'error' ? 'text-red-500' : 'text-green-500'">{{item.status}}</td>
+                  <td class="px-4 py-3">{{ item.created_at }}</td>
+                </tr>
+
+              </tbody>
+            </table>
+
+          </div>
+          <div class="sm:h-20 h-30 w-80 xs:w-full">
+            <mat-paginator [length]="data.total_data" *ngIf="data.total_data > 4" class="flex bg-transparent justify-end scale-75 xs:scale-100" [pageSize]="sizePage"
+              [pageIndex]="pageIndex" [pageSizeOptions]="[3, 6, 12, 24, 48, 99]" (page)="onPageChange($event)">
+            </mat-paginator>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div translate>
+    <lib-toastify-toast-container></lib-toastify-toast-container>
+  </div>

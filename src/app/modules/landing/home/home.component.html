@@ -1,0 +1,50 @@
+<div class="w-full h-full
+            bg-[url('assets/images/background.jpg')]
+             bg-cover bg-center dark:bg-dark">
+    <div class="bg-white/60 fixed w-full h-full z-0"></div>
+    <div class="items-center z-10" *transloco="let t">
+        <header-component></header-component>
+        <div class="relative z-20 w-screen flex flex-col gap-3 justify-center items-center h-[80vh]">
+            <div class="flex flex-col gap-3 justify-center items-center bg-black/20 p-5 rounded-xl">
+                <div class="font-extrabold text-4xl sm:text-7xl text-black text-center">
+                    {{'Check EVgate ID'|transloco}}
+                </div>
+                <button mat-button (click)="openCamera(action)" class="bg-primary text-white">
+                    {{(action.isStart ? 'Stop Scan' : 'Start Scan') |transloco}}
+                </button>
+                <div class="w-[20vh] sm:w-[30vh] h-[20vh] sm:h-[30vh] rounded-xl bg-black/50 overflow-hidden border-2 border-primary z-10"
+                    [ngClass]="{'hidden': !action.isStart}">
+                    <!-- For camera -->
+                    <div *ngIf="isLoading"
+                        class="absolute w-[20vh] sm:w-[30vh] h-[20vh] sm:h-[30vh] flex justify-center items-center opacity-80">
+                        <mat-spinner class="icon-size-[150px]"></mat-spinner>
+                    </div>
+                    <ngx-scanner-qrcode #action="scanner" [load]="true" [config]="config"
+                        (event)="handle(action, 'start')"></ngx-scanner-qrcode>
+                </div>
+                <div [ngClass]="{'hidden': !action.isStart || !barcodeData}">
+                    <span>{{ action.data.value | json }}</span><!-- value -->
+                    <!-- <span>{{ action.data | async | json }}</span>  -->
+                </div>
+                <button mat-button (click)="edit = !edit" class="bg-primary text-white">{{'Input EVgate
+                    ID'|transloco}}</button>
+                <div class="flex gap-2 items-center w-[30vh]" *ngIf="edit">
+                    <!-- <button mat-button *ngIf="!edit" (click)="edit = true">Add New Time</button> -->
+                    <mat-form-field class="w-full -mb-5">
+                        <!-- <mat-icon class="icon-size-5" matPrefix>whatshot</mat-icon> -->
+                        <input matInput [(ngModel)]="evgate" placeholder="{{'Evgate ID'|transloco}}"
+                            class="text-black font-semibold">
+                    </mat-form-field>
+                    <button mat-icon-button [ngClass]="{'-rotate-[405deg]': evgate.length}"
+                        class="transition-all duration-1000 bg-primary"
+                        (click)="evgate.length ? goToSummary() : (edit = false)">
+                        <mat-icon class="icon-size-5 text-white" matPrefix>{{'close'}}</mat-icon>
+                    </button>
+                </div>
+                <button [routerLink]="['/sign-in']" *ngIf="authenticated" mat-button class="bg-primary text-white">
+                    {{'Go To Dashboard'|transloco}}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

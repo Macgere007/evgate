@@ -1,0 +1,189 @@
+<!-- <div *ngIf="!isloadingdash"></div> -->
+<!-- Station assigned -->
+<div class="w-full">
+  <div class="w-full p-6 sm:p-8">
+    <div class="flex justify-between">
+      <div class="text-xl sm:text-3xl font-bold mt-3">{{'EVgate Graph' | transloco}}</div>
+      <div class="flex-row justify-end" *ngIf="active">
+        <button class="hidden md:inline-flex rounded-md text-black dark:text-white" mat-flat-button mat-button [matMenuTriggerFor]="actionsMenu" [disabled]="authCheck.role === 'admin' || (authCheck.role !== 'admin' && stationClientID && stationClientID.length < 2)">
+          {{'MainCharger' | transloco}} : <span class="font-bold text-green-500">{{active}}</span>
+        </button>
+        <div class="mt-2 md:hidden">
+          <button [matMenuTriggerFor]="actionsMenu" mat-icon-button *ngIf="authCheck.role !== 'admin'">
+            <mat-icon [svgIcon]="'heroicons_outline:dots-vertical'"></mat-icon>
+          </button>
+          <mat-menu #actionsMenu="matMenu">
+            <ng-container class="md:hidden" *ngIf="authCheck.role !== 'admin'">
+              <button mat-menu-item *ngFor="let s of stationClientID; index as i" [value]="s.value"
+                (click)="updateData(s.id, s.name)" class="w-60 m-1">
+                {{s.name}}
+              </button>
+            </ng-container>
+          </mat-menu>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-between flex-col sm:flex-row w-full">
+      <div>
+        <div class="mt-2 text-lg sm:text-2xl">
+          {{ DateActiveStartLabel }}<span *ngIf="DateActiveStartLabel !== DateActiveStopLabel"> - {{ DateActiveStopLabel }}</span> 
+        </div>
+        <div *ngIf="realtime" class="text-secondary">
+          (realtime)
+        </div>
+      </div>
+      <div class="flex flex-row justify-end mt-3 sm:mt-10 md:ml-12 lg:mt-3 mb-2">
+        <div class="w-60 sm:w-120 absolute z-20">
+          <mat-accordion class="example-headers-align" multi *ngIf="!isloadingGraph">
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  {{ nameTime === '' ? ('Filter Graph by Time' | transloco): (nameTime | transloco)}}
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <div class="flex flex-col sm:flex-row">
+                <div class="flex flex-col">
+                  <mat-form-field class="w-50">
+                    <mat-label>{{'Start Date' | transloco}}</mat-label>
+                    <input matInput [ngxMatDatetimePicker]="picker" [(ngModel)]="startTime">
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <ngx-mat-datetime-picker enableMeridian="true" [showSeconds]="true" #picker>
+                      <ng-template>
+                        <span>OK</span>
+                      </ng-template>
+                    </ngx-mat-datetime-picker>
+                  </mat-form-field>
+
+                  <mat-form-field class="w-50">
+                    <mat-label>{{'Stop Date' | transloco}}</mat-label>
+                    <input matInput [ngxMatDatetimePicker]="picker2" [(ngModel)]="stopTime">
+                    <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                    <ngx-mat-datetime-picker enableMeridian="true" [showSeconds]="true" #picker2>
+                      <ng-template>
+                        <span>OK</span>
+                      </ng-template>
+                    </ngx-mat-datetime-picker>
+                  </mat-form-field>
+
+                  <button class="bg-slate-500 rounded-md text-white" mat-button (click)="openDatepickerRange()">{{'Apply Changes'
+                    |transloco}}</button>
+                </div>
+                <mat-list>
+                  <button *ngFor="let item of datePickerInstant"
+                    (click)="openDatepickerInstant(item.minutes, item.interval, item.name, item.realtime)"
+                    class="truncate" mat-button>
+                    {{item.name|transloco}} <span class="text-secondary">{{item.realtime ? '(realtime)' : ''}}</span>
+                  </button>
+                </mat-list>
+              </div>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-expansion-panel>
+          </mat-accordion>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-wrap w-full justify-center items-center mx-auto p-6 sm:p-8 sm:pt-0 z-0 mt-2 gap-8 relative">
+    <div class="flex flex-col sm:flex-row gap-8 w-full" >
+      <app-dashboard-card title="Active Energy" [data]="chartEnergy" [isloadingGraph]="isloadingGraph" class="w-full"></app-dashboard-card>
+    </div>
+    <!-- <div class="flex flex-col sm:flex-row gap-8 w-full">
+      <app-dashboard-card title="Energy" [data]="chartReactiveActiveEnergy" [isloadingGraph]="isloadingGraph" class="w-full"></app-dashboard-card>
+    </div> -->
+    <div class="flex flex-col sm:flex-row gap-8 w-full">
+      <app-dashboard-card title="Power" [data]="chartPower" [isloadingGraph]="isloadingGraph" class="w-full"></app-dashboard-card>
+      <app-dashboard-card title="Temperature" [data]="chartTemp" [isloadingGraph]="isloadingGraph" class="w-full"></app-dashboard-card>
+    </div>
+
+    <div class="flex flex-col sm:flex-row gap-8 w-full">
+      <app-dashboard-card title="Current" [data]="chartCurrent" [isloadingGraph]="isloadingGraph" class="w-full"></app-dashboard-card>
+      <app-dashboard-card title="Power Factor" [data]="chartPowerFactor" [isloadingGraph]="isloadingGraph" class="w-full"></app-dashboard-card>
+    </div>
+
+    <div class="flex flex-col sm:flex-row gap-8 w-full">
+      <app-dashboard-card title="Voltage" [data]="chartVoltage" [isloadingGraph]="isloadingGraph" class="w-full"></app-dashboard-card>
+      <app-dashboard-card title="Leakage current" [data]="chartLeakage" [isloadingGraph]="isloadingGraph" class="w-full"></app-dashboard-card>
+    </div>
+    <div class="flex flex-col sm:flex-row gap-8 w-full">
+      <app-dashboard-card title="Total Harmonic Distortion Current (THDi)" [data]="chartTotalHarmonic" [isloadingGraph]="isloadingGraph" class="w-full"></app-dashboard-card>
+      <app-dashboard-card title="Overload" [data]="chartOverload" [isloadingGraph]="isloadingGraph" class="w-full"></app-dashboard-card>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full min-w-0 mb-2">
+      <!-- Total Energy -->
+      <!-- <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl h-48 overflow-hidden">
+        <div class="flex items-start justify-between">
+          <div class="text-lg flex items-center font-medium tracking-tight leading-6 truncate">
+            <mat-icon class="mr-2" svgIcon="mat_outline:cable"></mat-icon>
+            {{'Total Breaker Opened' |transloco}}
+          </div>
+        </div>
+        <div class="flex flex-col items-center mt-2">
+          <mat-progress-spinner color="primary" mode="indeterminate" *ngIf="isloading"></mat-progress-spinner>
+          <mat-progress-bar *ngIf="isloading || !breaker_open" class="m-12" mode="indeterminate"></mat-progress-bar>
+          <div
+            class="text-7xl font-bold tracking-tight leading-none text-green-400 mt-8 text-clip">
+            {{breaker_open}}
+          </div>
+          <div class="text-lg font-medium text-blue-600 dark:text-blue-500"></div>
+          <div class="flex items-baseline justify-center w-full mt-6 text-secondary"></div>
+        </div>
+      </div> -->
+
+      <!-- Total Pendapatan -->
+      <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl h-48 overflow-hidden">
+        <div class="flex items-start justify-between">
+          <div class="text-lg flex items-center font-medium tracking-tight leading-6 truncate">
+            <mat-icon class="mr-2" svgIcon="heroicons_outline:rss"></mat-icon>
+            {{'Main Frequency' |transloco}}
+          </div>
+        </div>
+        <div class="flex flex-col items-center mt-4">
+          <mat-progress-bar *ngIf="isloading || !main_frequency" class="m-auto" mode="indeterminate"></mat-progress-bar>
+          <div *ngIf="!isloading && main_frequency"
+            class="mt-4 text-7xl font-bold tracking-tight leading-none text-green-400 text-clip">
+            {{formatNumberWithLocale(main_frequency,1)}} Hz
+          </div>
+          <!-- <div *ngIf="!isloading" class="absolute mt-15 -ml-7 text-xl font-bold text-green-400 dark:text-white">
+
+          </div> -->
+        </div>
+      </div>
+      <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl h-48 overflow-hidden">
+        <div class="flex items-start justify-between">
+          <div class="text-lg flex items-center font-medium tracking-tight leading-6 truncate">
+            <mat-icon class="mr-2" svgIcon="heroicons_solid:status-online"></mat-icon>
+            {{'Status Breaker' |transloco}}
+          </div>
+        </div>
+        <div class="flex flex-col items-center mt-2">
+          <mat-progress-bar *ngIf="isloading" class="m-12"
+            mode="indeterminate"></mat-progress-bar>
+          <div *ngIf="!isloading"
+            [class]="status_breaker ? 'text-green-400 ': 'text-red-400'"
+            class="mt-4 text-7xl text-center font-bold tracking-tight leading-none text-clip">
+            {{status_breaker ? 'On' : 'Off' }}
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl h-48 overflow-hidden">
+        <div class="flex items-start justify-between">
+          <div class="text-lg flex items-center font-medium tracking-tight leading-6 truncate">
+            <mat-icon class="mr-2" svgIcon="heroicons_solid:status-online"></mat-icon>
+            {{'Status Connectivity' |transloco}}
+          </div>
+        </div>
+        <div class="flex flex-col items-center justify-center mt-2">
+          <mat-progress-bar *ngIf="isloading || status_connectivity === ''" class="m-12"
+            mode="indeterminate"></mat-progress-bar>
+          <div *ngIf="!isloading && status_connectivity !== ''"
+            [class]="status_connectivity === 'Offline' ? 'text-red-400' :'text-green-400'"
+            class="mt-4 text-7xl text-center font-bold tracking-tight leading-none text-clip">
+            {{status_connectivity}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

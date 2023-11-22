@@ -1,0 +1,23 @@
+<div *transloco="let t" class="relative flex flex-0 
+                            items-center w-full
+                            h-16 px-3 md:px-6 z-49
+                            bg-card dark:bg-black 
+                            print:hidden">
+  <img class="w-36" src="assets/images/logo/energie.png" alt="Logo image" />
+
+  <div class="flex items-center
+                    pl-2 ml-auto space-x-0.5 
+                    sm:space-x-2">
+  </div>
+  <div class=" pr-2">
+    <!-- <languages></languages> -->
+  </div>
+  <a class="w-28" mat-flat-button [color]="'primary'" 
+    (click)="goToLogin()"
+    [routerLink]="authenticated ? '/sign-out' : '/sign-in'">
+    <span class="ml-2 uppercase">{{ authenticated ? t('Log Out') : t('Log In') }}</span>
+    <mat-icon class="icon-size-5 duration-500" [ngClass]="{'rotate-180': !authenticated}"
+      [svgIcon]="'heroicons_outline:login'">
+    </mat-icon>
+  </a>
+</div>

@@ -1,0 +1,58 @@
+<div class="w-full">
+  <!-- Form -->
+  <form #settingsForm="ngForm" (ngSubmit)="onSubmit(settingsForm)">
+
+    <!-- Section -->
+    <div class="w-full">
+    </div>
+    <div class="grid sm:grid-cols-4 gap-6 w-full mt-8">
+      <!--  -->
+      <div class="sm:col-span-4">
+        <mat-form-field class="fuse-mat-no-subscript w-full">
+          <mat-label>{{'Car Brand'|transloco}}</mat-label>
+          <input matInput type="text" id="brand" name="brand" [formControl]="form.get('brand')"
+            [(ngModel)]="sendData.brandname">
+          <mat-error *ngIf="form.get('brand').hasError('required')">
+            This field required to be filled in.
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="sm:col-span-4">
+        <mat-form-field class="fuse-mat-no-subscript w-full">
+          <mat-label>{{'Car Type'|transloco}}</mat-label>
+          <input matInput type="text" id="type" name="type" [formControl]="form.get('type')"
+            [(ngModel)]="sendData.typename">
+          <mat-error *ngIf="form.get('type').hasError('required')">
+            This field required to be filled in.
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="sm:col-span-4">
+        <mat-form-field class="fuse-mat-no-subscript w-full">
+          <mat-label>{{'Car Capacity'|transloco}}</mat-label>
+          <input matInput type="number" id="capacity" name="capacity" [formControl]="form.get('capacity')"
+            [(ngModel)]="sendData.capacityname">
+          <mat-error *ngIf="form.get('capacity').hasError('required')">
+            This field required to be filled in.
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center justify-end">
+      <button [disabled]="loading" type="submit"
+        class="bg-primary text-white font-semibold w-30 h-10 flex items-center justify-center px-4 py-2 rounded-lg"
+        [class]="!loading ? 'hover:bg-primary-600' : ''">
+        <span *ngIf="!loading">{{'Save'|transloco}}</span>
+        <span *ngIf="loading">
+          <div
+            class="inline-block h-5 w-5 animate-spin rounded-full border-white border-4 mt-1 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+            role="status"></div>
+        </span>
+      </button>
+    </div>
+  </form>
+
+</div>
+

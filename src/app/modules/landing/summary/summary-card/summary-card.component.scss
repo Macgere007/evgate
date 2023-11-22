@@ -1,0 +1,151 @@
+@keyframes shake {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  50% { transform: rotate(10deg); }
+  75% { transform: rotate(-10deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.hover-shake:hover {
+  animation: shake 0.5s;
+}
+
+
+.progress-container {
+  height: 2px;
+  position: relative;
+
+  .progress-bar {
+    height: 100%;
+    opacity: 0.3;
+    transition: width 0.8s linear;
+
+    &::before {
+    //   content: attr(data-progress);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 12px;
+    }
+  }
+}
+
+$step: 15deg;
+
+@for $i from 1 through 24 {
+  .rotate-#{$i} {
+    transform: rotate($i * $step);
+  }
+}
+
+.lamp-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// lamp
+.lamp-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.switch {
+    width: 135px;
+    height: 35px;
+    cursor: pointer;
+    margin-left: 20px;
+    position: relative;
+
+    &:before,
+    &:after {
+      content: '';
+
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      height: 25px;
+    }
+
+    &:before {
+      background-color: green;
+      transition: left 0.8s, background-color 0.8s ease-out;
+      width: 65px;
+    }
+
+    &:after {
+      background-color: #fff;
+      width: 125px;
+    }
+
+    &.on {
+      background-color: #cbf6cb;
+      transition: background-color 0.8s ease-out;
+
+      &:before {
+        left: 65px;
+        transform: translate(1.5px,1.5px);
+        box-shadow: -1px -2px 2px rgba(0, 0, 0, 0.8);
+        background-color: green;
+      }
+    }
+
+    &.off {
+      background-color: #d4a5a5;
+      transition:  background-color 0.2s ease-out;
+
+      &:before {
+        background-color: rgb(230, 82, 82);
+        transform: translate(-1.5px,1.5px);
+        box-shadow: 1px -2px 2px rgba(0, 0, 0, 0.8);
+        transition: left 0.2s, background-color 0.2s ease-out;
+      }
+    }
+
+    &.charge {
+      background-color: #f0f0ea;
+      animation: battery-charge 2s linear infinite;
+      background-color: #00ff55;
+      &:before {
+        width: var(--switch-width, 1%) !important;
+        background-color: var(--switch-bg);
+        z-index: 100;
+        box-shadow: black 2px;
+        // opacity: 0.5;
+        transition: left 0.2s;
+        animation: pulse .8s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+      }
+
+      &:after {
+        background-color: white;
+      }
+    }
+  }
+
+  @keyframes battery-charge {
+    0% {
+        background: #4bfd4b;
+      }
+
+      50% {
+        background: #cbfb64;
+      }
+
+      100% {
+        background: #4bfd4b;
+      }
+  }
+
+  @keyframes pulse {
+    0% {
+      opacity: .5;
+    }
+    50% {
+      opacity: .2;
+    }
+    100% {
+      opacity: .5;
+    }
+  }

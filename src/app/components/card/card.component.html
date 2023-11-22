@@ -1,0 +1,17 @@
+<div class="flex flex-col flex-auto bg-card w-full shadow rounded-2xl overflow-hidden p-4 select-none truncate" [class]="style" [ngClass]="{'pb-9': !unit}">
+  <div class="flex items-start justify-center m-4 mb-0 text-center">
+    <mat-icon *ngIf="!icon_bottom" class="icon-size-4 sm:icon-size-6 mt-1.5 mr-1" [class]="icon_color">{{icon}}</mat-icon>
+    <div class="font-semibold" [ngClass]="{'text-xl sm:text-3xl': !icon_bottom, 'text-lg sm:text-xl': icon_bottom}">
+      {{title | transloco}}</div>
+  </div>
+  <div class="flex flex-col xxs:flex-row justify-center mx-6 mt-3">
+    <mat-progress-spinner class="icon-size-5 sm:icon-size-8" color="primary" mode="indeterminate" *ngIf="loading"></mat-progress-spinner>
+    <mat-icon *ngIf="icon_bottom" class="icon-size-4 sm:icon-size-6 mt-1.5 mr-1" [class]="icon_color">{{icon}}</mat-icon>
+    <div class="text-3xl font-bold" *ngIf="!loading">
+      {{value}}
+    </div>
+  </div>
+  <div *ngIf="unit" class="text-center text-xs sm:tex-sm text-black dark:text-white/60 sm:mb-1">
+    {{unit | transloco}}
+  </div>
+</div>

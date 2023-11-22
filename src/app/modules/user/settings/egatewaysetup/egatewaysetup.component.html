@@ -1,0 +1,65 @@
+<div class="w-full">
+  <!-- Form -->
+  <form #settingsForm="ngForm" (ngSubmit)="onSubmit(settingsForm)">
+
+    <!-- Section -->
+    <div class="w-full">
+    </div>
+    <div class="grid sm:grid-cols-4 gap-6 w-full mt-8">
+      <!--  -->
+      <div class="sm:col-span-4">
+        <mat-form-field class="fuse-mat-no-subscript w-full">
+          <mat-label>{{'Set Default Leakage'|transloco}}</mat-label>
+          <input matInput type="number" id="leakage" name="leakage" [formControl]="form.get('leakage')" [(ngModel)]="sendData.DefaultLeakage">
+          <mat-error *ngIf="form.get('leakage').hasError('required')">
+           This field required to be filled in.
+          </mat-error>
+          <mat-error *ngIf="form.get('leakage').hasError('min')">
+            Value must be greater than 0.2
+          </mat-error>
+        </mat-form-field>
+        <div class="text-md text-hint">{{'Minimum'|transloco}}: 0.2 A</div>
+      </div>
+      <div class="sm:col-span-4">
+        <mat-form-field class="fuse-mat-no-subscript w-full">
+          <mat-label>{{'Set Default Power'|transloco}}</mat-label>
+          <input matInput type="number" id="power" name="power" [formControl]="form.get('power')" [(ngModel)]="sendData.DefaultPower">
+          <mat-error *ngIf="form.get('power').hasError('required')">
+            This field required to be filled in.
+          </mat-error>
+          <mat-error *ngIf="form.get('power').hasError('min')">
+            Value must be greater than 8000
+          </mat-error>
+        </mat-form-field>
+        <div class="text-md text-hint">{{'Minimum'|transloco}}: 8000 Watt</div>
+      </div>
+      <div class="sm:col-span-4">
+        <mat-form-field class="fuse-mat-no-subscript w-full">
+          <mat-label>{{'Set Default Temperature'|transloco}}</mat-label>
+          <input matInput type="number" id="temperature" name="temperature" [formControl]="form.get('temperature')" [(ngModel)]="sendData.DefaultTemperature">
+          <mat-error *ngIf="form.get('temperature').hasError('required')">
+            This field required to be filled in.
+          </mat-error>
+          <mat-error *ngIf="form.get('temperature').hasError('min')">
+            Value must be greater than 8000 <mat-spinner class="icon-size-4 bg-whtie"></mat-spinner>
+          </mat-error>
+        </mat-form-field>
+        <div class="text-md text-hint">{{'Minimum'|transloco}}: 60 C</div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center justify-end">
+      <button [disabled]="loading" type="submit"
+        class="bg-primary text-white font-semibold w-30 h-10 flex items-center justify-center px-4 py-2 rounded-lg"
+        [class]="!loading ? 'hover:bg-primary-600' : ''">
+        <span *ngIf="!loading">{{'Save'|transloco}}</span>
+        <span *ngIf="loading">
+            <div
+            class="inline-block h-5 w-5 animate-spin rounded-full border-white border-4 mt-1 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+            role="status"></div></span>
+      </button>
+    </div>
+  </form>
+
+</div>

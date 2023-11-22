@@ -1,0 +1,46 @@
+<div class="bg-card p-4 rounded-xl w-[40vh] min-h-40 shadow-md">
+  <div class="w-full flex justify-between truncate select-none">
+    <div [matTooltip]="' '+ data.signal + ' dBm'" class="cursor-default">
+      <i class="material-icons opacity-20 -mx-40 absolute">
+        signal_wifi_3_bar
+      </i>
+      <i class="material-icons opacity-60 -mx-40" [ngClass]="{'text-green-500': data.signal > -70 && data.signal >= -85, 'text-yellow-500': data.signal < -72 && data.signal >= -85, 'text-red-500': data.signal < -85}">
+        {{(data.signal > -70 ) ? 'signal_wifi_3_bar' : (data.signal < -72 && data.signal >= -85) ? 'signal_wifi_2_bar' : 'signal_wifi_1_bar'}}
+      </i>
+    </div>
+    <div class="cursor-pointer" (click)="clickAlarm()">
+      <mat-icon svgIcon="mat_outline:notifications_none" class="mx-2 whitespace-nowrap hover-shake" ></mat-icon>
+    </div>
+  </div>
+  <div class="w-full">
+    <div class="absolute ml-3 text-xl font-extrabold" [ngClass]="{'text-red-500': status  === 'Inactive', 'text-green-500': status  === 'Active', 'text-yellow-500': status  === 'Charging'}">
+      {{status}}
+    </div>
+    <div class="lamp-container -rotate-90 py-10 mt-5">
+      <div class="switch rounded-md flex justify-around items-center text-sm before:z-20"
+        [class]="status  === 'Charging' ? 'rounded-md after:rounded-none' : 'before:rounded-md after:rounded-md'"
+        [matTooltip]="status  === 'Inactive' ? ('Turn On' | transloco) : status === 'Charging' ? ('Stop Charging' | transloco) : ('Turn Off' | transloco)"
+        [style.--switch-width.%]="switchWidth * 93/100" [style.--switch-bg]="switchBg" (click)="(status  === 'Active' || status === 'Charging') ? turnOnOff('Inactive') : turnOnOff('Active')"
+        [ngClass]="{'on': status === 'Active', 'off': status === 'Inactive', 'charge': status === 'Charging'}">
+        <div *ngIf="status  === 'Charging'"
+          class="rotate-90 z-30 w-full text-black transition-all duration-[800ms] flex items-center justify-center flex-col">
+          <div class="text-green-400 text-xs sm:text-xs">
+              {{ energyCharging ? formatNumberWithLocale(energyCharging) : 0}}
+          </div>
+          <div class="text-[8px] text-slate-600">kWh</div>
+          <mat-icon class="z-30 animate-pulse">bolt</mat-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid grid-cols-3">
+    <div class="text-center">{{'Power'|transloco}} <br/> {{data.power ? formatNumberWithLocale(data.power, 3) : 0}} <span class="text-xs text-slate-400">kW</span></div>
+    <button mat-button (click)="clickSummary()" class="mt-2 bg-slate-200 dark:bg-slate-700">{{'Summary'|transloco}}</button>
+    <div class="text-center">{{'Temperature'|transloco}}<br/> {{data.phase_terminal_temperature}} <span class="text-xs text-slate-400">C</span></div>
+  </div>
+  <div class="grid grid-cols-3 mt-2">
+    <div class="text-center">{{'Current'|transloco}} <br/> {{data.current}} <span class="text-xs text-slate-400">A</span></div>
+    <div class="text-center">{{'Stand Meter'|transloco}} <br/> {{data.energy_akumulatif}} <span class="text-xs text-slate-400">kWh</span></div>
+    <div class="text-center">{{'Voltage'|transloco}} <br/> {{data.voltage}} <span class="text-xs text-slate-400">V</span></div>
+  </div>
+</div>

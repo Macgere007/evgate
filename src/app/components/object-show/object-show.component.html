@@ -1,0 +1,5 @@
+<div class="grid" [class]="style" id="checkstyle">
+  <div *ngFor="let key of getObjectKeys()" class="border-b-2 sm:mt-2 flex sm:justify-start justify-between capitalize" [ngClass]="{'hidden': !key.length}">
+    <strong>{{ getKeyName(key) }}:</strong> &nbsp; {{ (key === 'time' ? (data[key] | date: 'HH:mm, dd-MM-YYYY') : data[key]) + ' ' + getUnit(key) }}
+  </div>
+</div>

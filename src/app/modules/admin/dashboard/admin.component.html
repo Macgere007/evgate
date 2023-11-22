@@ -1,0 +1,43 @@
+<div *ngIf="!isloading" class="w-full m-1 sm:m-6" [class]="siteCardAll && siteCardAll.length > 4 ? 'mb-15 sm:mb-20': ''">
+    <div class="p-3">
+        <app-summary-card [statusCard]="dataSummary"></app-summary-card>
+    </div>
+    <div class="w-full flex flex-col sm:flex-row gap-1 items-center justify-center p-2 sm:p-0">
+        <button mat-button (click)="addSite()" class="font-medium bg-primary-500 mb-5
+            sm:mx-2 sm::ml-0 text-white w-full sm:w-fit">{{'Add Site'|transloco}}
+            <mat-icon class="text-white">add</mat-icon>
+        </button>
+        <button mat-button (click)="showAllEvgate()" class="font-medium bg-primary-500 mb-5
+            sm:mr-2 sm::ml-0 text-white w-full sm:w-fit">{{'Show Evgate'|transloco}}
+            <mat-icon class="text-white">ev_station</mat-icon>
+        </button>
+        <div class="w-full">
+            <search-component (search)="onSearch($event)" [defaultValue]="filter" placeholder="Search ..."></search-component>
+        </div>
+    </div>
+    <div *ngIf="isloading" class="h-full py-30 w-full flex justify-center items-center">
+        <mat-spinner></mat-spinner>
+      </div>
+    <div *ngIf="!isloading" class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 sm:gap-x-6 mb-12 sm:mb-5 -mt-4">
+        <app-ev-card class="sm:mb-4 lg:mb-0" *ngFor="let item of siteCard" [item]="item" [dataEV]="searchEvNotAssigned" (deleteSiteUi)="deleteSite($event)" (assignUnassign)="assignUnassign($event)"></app-ev-card>
+    </div>
+    <div *ngIf="!isloading && siteCard.length === 0" class="w-full flex justify-center items-center m-auto text-2xl sm:text-4xl mt-5 sm:mt-20 font-bold">
+        {{'No Site Available' | transloco}}
+    </div>
+    <mat-paginator [length]="CountOfData" *ngIf="siteCardAll && siteCardAll.length > 4"
+        class="absolute -bottom-4 sm:bottom-0 right-0 mt-2 mb-2 bg-transparent"
+        [pageSize]="sizePage"
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="[2, 12, 24, 48, 92]"
+        (page)="onPageChange($event)">
+    </mat-paginator>
+
+</div>
+
+<div *ngIf="isloading" class="py-30 w-full flex justify-center items-center">
+    <mat-spinner></mat-spinner>
+</div>
+
+<div translate>
+    <lib-toastify-toast-container></lib-toastify-toast-container>
+</div>

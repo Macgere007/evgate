@@ -1,0 +1,189 @@
+<mat-progress-bar *ngIf="!powerChart || !temperChart" class="m-auto" mode="indeterminate"></mat-progress-bar>
+<div class="progress-container w-full" *ngIf="item.active">
+  <div class="progress-bar bg-primary rounded-md" [style.width.%]="this.numheartbeat >= 0 ? ((this.numheartbeat / 30) * 100) : 0"
+    [attr.data-progress]="numheartbeat"></div>
+</div>
+<div *ngIf="powerChart && temperChart" class="px-4 py-8 sm:px-4 sm:py-4 bg-card w-full h-full"
+  [class]="item.leakage_current_value.length > 0 && item.leakage_current_value[item.leakage_current_value.length-1].y > Form.value.LeakageLimit ? 'bg-red-200 animate-pulse h-full sm:h-screen' : 'bg-card'">
+  <div class="flex justify-between">
+    <div class="text-lg sm:text-xl font-semibold z-10 flex items-center truncate">
+      <span [matTooltip]="item.customer_id">{{item.name}}</span>
+      <mat-checkbox color="primary" [matTooltip]="('Energy Chart View' | transloco)" (change)="clickUpdateData()"
+        [(ngModel)]="item.active">
+      </mat-checkbox>
+      <div class="opacity-10 text-sm font-light select-none" *ngIf="item.active">
+        {{numheartbeat > -1 ? numheartbeat : numheartbeat <= -10 ? 'offline' : 'waiting' }} </div>
+      </div>
+      <div class="z-10 flex flex-row">
+        <button mat-icon-button *ngIf="auth.role === 'admin'"
+          [routerLink]="['/analitic-dashboard']"
+          [queryParams]="{ id: item.customer_id, name: item.name }"
+          routerLinkActive="router-link-active"
+          [matTooltip]="('Show Analytics' | transloco)">
+          <mat-icon svgIcon="heroicons_outline:presentation-chart-bar"></mat-icon>
+        </button>
+        <button mat-icon-button [matMenuTriggerFor]="settingMenu">
+          <mat-icon class="text-2xl" [svgIcon]="'heroicons_outline:cog'"></mat-icon>
+        </button>
+        <mat-menu #settingMenu="matMenu">
+          <button mat-menu-item
+            *ngIf="item.active"
+            (click)="item.status === 'Active' || item.status === 'Charging' ? turnOnOff('off') : turnOnOff('on')">
+            <mat-icon svgIcon="feather:power"></mat-icon>
+            {{ item.status === 'Active' || item.status === 'Charging' ? ('Turn Off' | transloco) : ('Turn On' |
+            transloco) }}
+          </button>
+          <button mat-menu-item
+          (click)="startCharging()" *ngIf="simAccCharging?.includes(item.customer_id) && item.active && item.status !== 'Charging'">
+            <mat-icon svgIcon="mat_solid:electric_car"></mat-icon>
+            {{ 'Start Charging' | transloco }}
+          </button>
+          <button mat-menu-item (click)="editName()">
+            <mat-icon svgIcon="drive_file_rename_outline"></mat-icon>
+            {{ 'Edit Name' | transloco }}
+          </button>
+          <button mat-menu-item (click)="editMailNotif()">
+            <mat-icon svgIcon="mat_outline:mark_email_unread"></mat-icon>
+            {{'Set Email Notification' |transloco}}
+          </button>
+          <button mat-menu-item [matMenuTriggerFor]="limitMenu" *ngIf="item.active" class="hidden sm:flex items-center">
+            <mat-icon svgIcon="mat_outline:build_circle" class="mr-2"></mat-icon>
+            {{ 'Limit Settings' | transloco }}
+          </button>
+          <button mat-menu-item (click)="editEnergy()" *ngIf="item.active" class="sm:hidden">
+            <mat-icon svgIcon="mat_outline:offline_bolt"></mat-icon>
+            {{ 'Set Energy Limit' | transloco }}
+          </button>
+          <button mat-menu-item (click)="editPower()" *ngIf="item.active" class="sm:hidden">
+            <mat-icon svgIcon="mat_outline:electrical_services"></mat-icon>
+            {{ 'Set Power Limit' | transloco }}
+          </button>
+          <button mat-menu-item (click)="editTemperature()" *ngIf="item.active" class="sm:hidden">
+            <mat-icon svgIcon="mat_outline:device_thermostat"></mat-icon>
+            {{ 'Set Temperature Limit' | transloco }}
+          </button>
+          <button mat-menu-item (click)="editLeakage()" *ngIf="item.active" class="sm:hidden">
+            <mat-icon svgIcon="feather:zap-off"></mat-icon>
+            {{ 'Set Leakage Limit' | transloco }}
+          </button>
+          <button mat-menu-item (click)="resetLimit()" *ngIf="item.active">
+            <mat-icon svgIcon="mat_outline:cached"></mat-icon>
+            {{'Reset Limit' |transloco}}
+          </button>
+        </mat-menu>
+        <mat-menu #limitMenu="matMenu">
+          <button mat-menu-item (click)="editEnergy()">
+            <mat-icon svgIcon="mat_outline:offline_bolt"></mat-icon>
+            {{ 'Set Energy Limit' | transloco }}
+          </button>
+          <button mat-menu-item (click)="editPower()">
+            <mat-icon svgIcon="mat_outline:electrical_services"></mat-icon>
+            {{ 'Set Power Limit' | transloco }}
+          </button>
+          <button mat-menu-item (click)="editTemperature()">
+            <mat-icon svgIcon="mat_outline:device_thermostat"></mat-icon>
+            {{ 'Set Temperature Limit' | transloco }}
+          </button>
+          <button mat-menu-item (click)="editLeakage()">
+            <mat-icon svgIcon="feather:zap-off"></mat-icon>
+            {{ 'Set Leakage Limit' | transloco }}
+          </button>
+        </mat-menu>
+      </div>
+    </div>
+    <div *ngIf="item.active" class="w-fit font-semibold shadow-none z-30"
+      [class]="item.status === 'Active' ? 'text-green-400': item.status === 'Charging' ? 'text-yellow-400' : 'text-blue-400'">
+      ({{item.status | transloco}})
+    </div>
+    <div *ngIf="item.active" class="flex text-sm z-10 h-5 text-green-400 justify-between">
+        <span [class]="item.active && ActiveType !== 'daily' && energy !== ': null kWh' ? 'flex' : 'opacity-0'"
+        >
+        {{ActiveType | transloco}} : {{energy === 'NaN' ? '0': energy}} kWh</span>
+        <div *ngIf="item.status === 'Charging' && energyCharging === 0"
+            class="inline-block h-5 w-5 animate-spin rounded-full border-white border-4 border-solid border-current border-r-transparent motion-reduce:animate-[spin_1.5s_linear_infinite]"
+            role="status"></div>
+        <span *ngIf="item.status === 'Charging' && energyCharging > 0">{{energyCharging ? formatNumberWithLocale(energyCharging) : 0}} kWh</span>
+    </div>
+
+    <div *transloco="let t">
+      <div class="flex justify-center items-center text-sm text-secondary" [class]="item.active ? 'opacity-100':'opacity-0'">
+        <!-- {{
+        item.leakage_current_value.length === 0 ?
+        t('Charger Offline') :
+        (item.leakage_current_value[item.leakage_current_value.length-1].y === 0 ?
+        t('No leaks found in this charger') :
+        t('A leak has been detected in this charger with') + ' ' +
+        item.leakage_current_value[item.leakage_current_value.length-1].y.toFixed(2) + ' A'
+        )
+        }} -->
+      </div>
+    </div>
+    <div class="-mt-20 sm:-mt-12 mb-20 sm:mb-0" *ngIf="item?.power.length > 0 && item.active">
+      <div class="flex items-center justify-between ml-10 sm:ml-5 w-full">
+        <div class="text-lg lg:text-3xl font-semibold absolute z-20 mt-60 lg:mt-50 md:mt-60 sm:mt-50">
+          <div class="mt-5 text-xs sm:text-xs text-secondary"
+            *ngIf="(item?.power?.length > 0 && item?.power_limit < item?.power[item?.power.length - 1]?.y && item.power_limit !== null) || (item?.power_limit === null && auth?.default_limit?.power < item?.power[item?.power.length - 1]?.y)">
+            {{'Over' | transloco}}
+          </div>
+          {{'Power' | transloco}}
+        </div>
+        <div
+          [class]="(item?.power?.length > 0 && item?.power_limit < item?.power[item?.power.length - 1]?.y && item?.power_limit !== null) || (item?.power_limit === null && auth?.default_limit.power < item?.power[item?.power.length - 1]?.y) ? 'mt-72' : ''"
+          class="absolute ml-26 lg:ml-[14%] mt-60 lg:mt-50 md:mt-60 sm:mt-50 text-xl lg:text-4xl z-10 font-bold tracking-tighter leading-tight">
+          {{ item?.power.length > 0 && item?.power[item?.power.length - 1].y !== 0 ? formatNumberWithLocale(item?.power[item?.power.length -
+          1].y) : 0 }} W
+        </div>
+      </div>
+      <div
+        class="flex flex-col flex-auto h-[5vh] md:h-[7vh] sm:h-[5vh] lg:h-[20vh] mb-0 sm:mb-15 md:mb-0 lg:mb-0 -ml-18 mr-0 sm:mr-10 md:mr-14"
+        *ngIf="powerChart">
+        <apx-chart [chart]="powerChart.chart" [colors]="powerChart.colors" [dataLabels]="powerChart.dataLabels"
+          [fill]="powerChart.fill" [grid]="powerChart.grid" [series]="powerChart.series" [legend]="powerChart.legend"
+          [stroke]="powerChart.stroke" [tooltip]="powerChart.tooltip" [xaxis]="powerChart.xaxis"
+          [yaxis]="powerChart.yaxis"></apx-chart>
+      </div>
+
+      <div class="flex items-center justify-between ml-10 sm:ml-5 mb-20 md:mb-20 sm:mb-0 lg:mb-15">
+        <div class="text-lg lg:text-3xl font-semibold absolute z-20 mt-90 sm:mt-50 md:mt-100 lg:mt-50">
+          <div class="mt-5 text-xs sm:text-xs text-secondary"
+            *ngIf="(item?.temperature.length > 0 && item.temperature_limit < item?.temperature[item?.temperature.length - 1].y && item.temperature_limit !== null) || (item.temperature.limit === null && auth.default_limit.temperature < item?.temperature[item?.temperature.length - 1].y)">
+            {{'Over' | transloco}}
+          </div>
+          {{'Temperature' | transloco}}
+        </div>
+        <div
+          [class]="(item?.temperature.length > 0 && item.temperature_limit < item?.temperature[item?.temperature.length - 1].y && item.temperature_limit !== null) || (item.temperature.limit === null && auth.default_limit.temperature < item?.temperature[item?.temperature.length - 1].y) ? 'mt-80' : ''"
+          class="absolute ml-26 lg:ml-[14%] mt-90 md:mt-100 sm:mt-50 lg:mt-50 text-xl lg:text-4xl z-10 font-bold tracking-tighter leading-tight">
+          {{ item?.temperature.length > 0 && item?.temperature[item?.temperature.length - 1].y !== 0 ?
+            formatNumberWithLocale(item?.temperature[item?.temperature.length - 1].y) : 0 }} C
+        </div>
+      </div>
+      <div class="flex flex-col flex-auto h-[8vh] md:h-[10vh] sm:h-[20vh] lg:h-[20vh] -ml-20 mr-0 sm:mr-10 md:mr-14"
+        *ngIf="temperChart">
+        <apx-chart class="mt-20 sm:mt-8 md:mt-15 lg:-mt-8" [chart]="temperChart.chart" [colors]="temperChart.colors"
+          [dataLabels]="temperChart.dataLabels" [fill]="temperChart.fill" [grid]="temperChart.grid"
+          [series]="temperChart.series" [legend]="temperChart.legend" [stroke]="temperChart.stroke"
+          [tooltip]="temperChart.tooltip" [xaxis]="temperChart.xaxis" [yaxis]="temperChart.yaxis"></apx-chart>
+      </div>
+    </div>
+
+    <div class="w-full h-full flex flex-col justify-center items-center" *ngIf="item?.power.length === 0">
+      <mat-icon class="icon-size-20" svgIcon="mat_outline:signal_wifi_connected_no_internet_4" *ngIf="numheartbeat%2 === 0"></mat-icon>
+      <mat-icon class="icon-size-20" svgIcon="mat_outline:signal_wifi_statusbar_connected_no_internet_4" *ngIf="numheartbeat%2 !== 0"></mat-icon>
+      <div class="text-gray-500">
+        {{'EVGate Disconnected' | transloco}}
+      </div>
+    </div>
+    <div class="w-full h-full flex flex-col justify-center items-center mt-10" *ngIf="!item.active">
+      <mat-icon class="icon-size-20" svgIcon="feather:bar-chart-2" *ngIf="numheartbeat%2 === 0"></mat-icon>
+      <mat-icon class="icon-size-20" svgIcon="feather:bar-chart" *ngIf="numheartbeat%2 !== 0"></mat-icon>
+      <div class="text-gray-500">
+        {{'Graph is hidden' | transloco}}
+      </div>
+    </div>
+  </div>
+
+
+  <div translate>
+    <lib-toastify-toast-container></lib-toastify-toast-container>
+  </div>

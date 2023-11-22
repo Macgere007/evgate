@@ -1,0 +1,53 @@
+<div class="flex flex-col flex-auto min-w-0 text-black dark:text-white">
+    <!-- Main -->
+    <div class="flex-auto xxs:m-5 md:m-10">
+      <!-- <div class="d-flex">
+        <h6 class="mt-2 mb-2 ms-3 text-3xl font-bold"><span>{{'Transaction EVgate' | transloco}}</span></h6>
+      </div> -->
+      <!--transactions table -->
+      <div class="grid grid-cols-1 gap-2 w-full">
+        <div class="xl:col-span-2 flex flex-col flex-auto bg-card shadow rounded-2xl overflow-hidden">
+          <div class="overflow-x-auto mx-2 max-h-[70vh]">
+            <div class="h-full flex items-center" *ngIf="isloading">
+              <mat-progress-bar class="" mode="indeterminate"></mat-progress-bar>
+            </div>
+            <table class="w-full rounded-2xl"  *ngIf="!isloading">
+              <thead class="border-b border-gray-500 bg-white dark:bg-card dark:border-gray-50 sticky top-0 z-10">
+                <tr class="text-lg font-semibold tracking-normal text-center relative text-primary">
+                  <th class="px-4 py-3">No</th>
+                  <th class="px-4 py-3">{{'Token'|transloco}}</th>
+                  <th class="px-4 py-3">{{'ID Meter' | transloco}}</th>
+                  <th class="px-4 py-3">{{'Energy'|transloco}}</th>
+                  <th class="px-4 py-3"></th>
+                </tr>
+              </thead>
+              <td colspan="10" class="text-2xl text-center p-6" *ngIf="data.length === 0 || isloading">{{'No token
+                available.'|transloco}}</td>
+              <tbody class="" *ngIf="!isloading">
+                <tr *ngFor="let token of data; index as i"
+                  class="text-black dark:text-white text-center text-md">
+                  <td class="px-4 py-3">{{ (i+1) }}</td>
+                  <td class="px-4 py-3">
+                    <div class="flex items-center justify-center">
+                      <div class="px-4 py-3 max-w-40 truncate">{{ token.token }}</div>
+                      <button mat-button (click)="copyToClipboard(token.token)"><i class="copy-icon far fa-copy"></i></button>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="flex items-center justify-center">
+                      <div class="px-4 py-3 max-w-40 truncate" [matTooltip]="token.idmeter">{{ token.idmeter }}</div>
+                      <button mat-button (click)="copyToClipboard(token.idmeter)"><i class="copy-icon far fa-copy"></i></button>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3">{{token.energi}} kWh</td>
+                  <td><button mat-button (click)="deleteToken(token.token)"><mat-icon class="text-red-500" [svgIcon]="'heroicons_outline:trash'"></mat-icon></button></td>
+                </tr>
+
+              </tbody>
+            </table>
+
+          </div>
+
+      </div>
+    </div>
+  </div>
